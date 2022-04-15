@@ -1,35 +1,48 @@
 
-const url = 'https://api.coinlore.net/api/tickers/?limit=5';
+const url = 'https://api.coinlore.net/api/tickers/?limit=100';
 
 fetch(url)
     .then(res => res.json()) // parse response as JSON
     .then(data => {
-      console.log(data);
 
-      document.querySelector('.NameAndTicker.BTC').innerText = `${data.data[0].name} (${data.data[0].symbol})`;
-      document.querySelector('.Price.BTC').innerText = `Price: $${data.data[0].price_usd}`;
-      document.querySelector('.Change.BTC').innerText = `24hr Change: ${data.data[0].percent_change_24h} %`;
-      document.querySelector('.Volume.BTC').innerText = `24hr Volume: ${Math.round(data.data[0].volume24)}`;
+      // Create our number formatter.
+      const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      });
 
-      document.querySelector('.NameAndTicker.ETH').innerText = `${data.data[1].name} (${data.data[1].symbol})`;
-      document.querySelector('.Price.ETH').innerText = `Price: $${data.data[1].price_usd}`;
-      document.querySelector('.Change.ETH').innerText = `24hr Change: ${data.data[1].percent_change_24h} %`;
-      document.querySelector('.Volume.ETH').innerText = `24hr Volume: ${Math.round(data.data[1].volume24)}`;
+      let coin = data.data;
+      let mainContainer = document.querySelector('.mainContainer');
 
-      document.querySelector('.NameAndTicker.USDT').innerText = `${data.data[2].name} (${data.data[2].symbol})`;
-      document.querySelector('.Price.USDT').innerText = `Price: $${data.data[2].price_usd}`;
-      document.querySelector('.Change.USDT').innerText = `24hr Change: ${data.data[2].percent_change_24h} %`;
-      document.querySelector('.Volume.USDT').innerText = `24hr Volume: ${Math.round(data.data[2].volume24)}`;
+      coin.forEach( (e,i) => {
 
-      document.querySelector('.NameAndTicker.BNB').innerText = `${data.data[3].name} (${data.data[3].symbol})`;
-      document.querySelector('.Price.BNB').innerText = `Price: $${data.data[3].price_usd}`;
-      document.querySelector('.Change.BNB').innerText = `24hr Change: ${data.data[3].percent_change_24h} %`;
-      document.querySelector('.Volume.BNB').innerText = `24hr Volume: ${Math.round(data.data[3].volume24)}`;
+        let div = document.createElement('div');
+        div.style.background = i % 2 === 0 ? 'white' : 'lightGray';
+        let coinName = document.createElement('span');
+        coinName.classList.add('coinName');
+        let coinSymbol = document.createElement('span');
+        coinSymbol.classList.add('coinSymbol');
+        let price = document.createElement('span');
+        price.classList.add('price');
+        let change = document.createElement('span');
+        change.classList.add('change');
+        let volume = document.createElement('span');
+        volume.classList.add('volume');
 
-      document.querySelector('.NameAndTicker.USDC').innerText = `${data.data[4].name} (${data.data[4].symbol})`;
-      document.querySelector('.Price.USDC').innerText = `Price: $${data.data[4].price_usd}`;
-      document.querySelector('.Change.USDC').innerText = `24hr Change: ${data.data[4].percent_change_24h} %`;
-      document.querySelector('.Volume.USDC').innerText = `24hr Volume: ${Math.round(data.data[4].volume24)}`;
+        mainContainer.appendChild(div);
+        div.appendChild(coinName);
+        div.appendChild(coinSymbol);
+        div.appendChild(price);
+        div.appendChild(change);
+        div.appendChild(volume);
+
+        coinName.innerText = e.name;
+        coinSymbol.innerText = e.symbol;
+        price.innerText = formatter.format(e['price_usd']);
+        change.innerText = e['percent_change_24h'] + ' %';
+        change.style.color = e['percent_change_24h'] < 0 ? 'red' : 'green';
+        volume.innerText = formatter.format(Math.round(e.volume24));
+      });
 
     })
     .catch(err => {
